@@ -59,12 +59,11 @@ export default function Home(): JSX.Element {
       </Canvas>
 
       {(winner || isDraft) && (
-        <div className="endscreen">
-          <div>
-            {winner && <div className="winner">{winner} wins!</div>}
-            {isDraft && <div className="draft">Draft!</div>}
-            <button onClick={restartGame}>Try again</button>
-          </div>
+        <div className="endscreen" onClick={restartGame}>
+          {winner && (
+            <div className={`winner winner${winner}`}>{winner} wins!</div>
+          )}
+          {isDraft && <div className="draft">Draft!</div>}
         </div>
       )}
 
@@ -80,15 +79,22 @@ export default function Home(): JSX.Element {
           right: 0;
           left: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
           align-items: center;
           display: flex;
           justify-content: center;
-        }
-        .endscreen > div {
-          padding: 3rem;
-          background: white;
+          padding: 2rem;
           text-align: center;
+          font-size: 4rem;
+          font-weight: 900;
+          color: #fff;
+          text-transform: uppercase;
+          text-shadow: 0 0 20px #223;
+        }
+        .winnerX {
+          text-shadow: 0 0 20px red;
+        }
+        .winnerO {
+          text-shadow: 0 0 20px blue;
         }
         footer {
           position: absolute;
