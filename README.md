@@ -8,7 +8,7 @@ This is a small web app that allows you to play tic-tac-toe.
 Developing
 ----------
 
-This is a web site that uses web technologies like [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [Next.js](https://nextjs.org/), [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/).
+This is a web site that uses web technologies like [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [three.js](https://threejs.org/), [react-three-fiber](https://github.com/pmndrs/react-three-fiber), [Next.js](https://nextjs.org/), [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/).
 
 To get started run
 
