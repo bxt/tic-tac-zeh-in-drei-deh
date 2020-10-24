@@ -68,7 +68,7 @@ export const Cell: FC<CellProps> = ({
     ? currentPlayer === 'X'
       ? '#f99'
       : '#99f'
-    : 'grey';
+    : '#223';
 
   return (
     <>
