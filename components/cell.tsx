@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 
 import { Cell as CellType, Player } from './game';
 
@@ -19,9 +19,6 @@ export const Cell: FC<CellProps> = ({
   onClick,
   position,
 }) => {
-  // This reference will give us direct access to the mesh
-  const mesh = useRef();
-
   const handleClick = useCallback(
     (event) => {
       event.stopPropagation();
@@ -58,7 +55,6 @@ export const Cell: FC<CellProps> = ({
 
   return (
     <mesh
-      ref={mesh}
       position={position}
       onClick={disabled ? undefined : handleClick}
       scale={hoveredYetNotDisabled ? [1.1, 1.1, 1.1] : [1, 1, 1]}
