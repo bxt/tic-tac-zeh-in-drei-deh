@@ -113,6 +113,7 @@ export const globalStyles = css.global`
     line-height: 1.6;
     height: 100%;
     background: #334;
+    background: radial-gradient(#334, #112);
   }
   body > div {
     height: 100%;
