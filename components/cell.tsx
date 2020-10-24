@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 
 import { Cell as CellType, Player } from './game';
 
@@ -22,6 +22,14 @@ export const Cell: FC<CellProps> = ({
   // This reference will give us direct access to the mesh
   const mesh = useRef();
 
+  const handleClick = useCallback(
+    (event) => {
+      event.stopPropagation();
+      onClick();
+    },
+    [onClick],
+  );
+
   // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false);
 
@@ -41,10 +49,15 @@ export const Cell: FC<CellProps> = ({
     <mesh
       ref={mesh}
       position={position}
-      onClick={disabled ? undefined : onClick}
+      onClick={disabled ? undefined : handleClick}
       scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        setHover(true);
+      }}
+      onPointerOut={() => {
+        setHover(false);
+      }}
     >
       <boxBufferGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color={color} />
