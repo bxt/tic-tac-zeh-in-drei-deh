@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useReducer } from 'react';
 
 const players = ['X', 'O'] as const;
 type Player = typeof players[number];
@@ -35,8 +35,41 @@ const defaultGame = (): Game => {
   return [makeGrid, areas];
 };
 
+const [makeGrid, areas] = defaultGame();
+
 const at = (grid: Grid, cellCoords: CellCoords): Cell =>
   grid[cellCoords[0]][cellCoords[1]];
+
+type State = {
+  grid: Grid;
+  currentPlayer: Player;
+};
+
+const makeInitialState = (): State => ({
+  grid: makeGrid(),
+  currentPlayer: 'X',
+});
+
+type Action =
+  | { type: 'CLAIM_CELL'; rowNumber: number; cellNumber: number }
+  | { type: 'RESTART' };
+
+const reducer = ({ grid, currentPlayer }: State, action: Action): State => {
+  switch (action.type) {
+    case 'CLAIM_CELL':
+      const { rowNumber, cellNumber } = action;
+      return {
+        grid: grid.map((row, rN) =>
+          row.map((cell, cN) =>
+            rN === rowNumber && cN === cellNumber ? currentPlayer : cell,
+          ),
+        ),
+        currentPlayer: currentPlayer === 'X' ? 'O' : 'X',
+      };
+    case 'RESTART':
+      return makeInitialState();
+  }
+};
 
 type GameControls = {
   claimCell: (cellCoords: CellCoords) => void;
@@ -48,9 +81,8 @@ type GameControls = {
 };
 
 export const useGameControls = (): GameControls => {
-  const [makeGrid, areas] = defaultGame();
-  const [grid, setGrid] = useState<Grid>(makeGrid());
-  const [currentPlayer, setCurrentPlayer] = useState<Player>('X');
+  const [state, dispatch] = useReducer(reducer, makeInitialState());
+  const { grid } = state;
 
   const winningArea = useMemo(() => {
     return areas.find((area) => {
@@ -59,11 +91,11 @@ export const useGameControls = (): GameControls => {
         first && area.every((cellCoords) => at(grid, cellCoords) === first)
       );
     });
-  }, [grid, areas]);
+  }, [grid]);
 
   const winner = winningArea ? at(grid, winningArea[0]) : null;
-  const full = grid.every((row) => row.every((cell) => cell));
-  const isDraft = full && !winner;
+  const isFull = grid.every((row) => row.every((cell) => cell));
+  const isDraft = isFull && !winner;
 
   const isInWinningArea = useCallback(
     ([rowNumber, cellNumber]) =>
@@ -75,23 +107,12 @@ export const useGameControls = (): GameControls => {
   );
 
   const restartGame = useCallback(() => {
-    setGrid(makeGrid());
-    setCurrentPlayer('X');
-  }, [makeGrid]);
+    dispatch({ type: 'RESTART' });
+  }, []);
 
-  const claimCell = useCallback(
-    ([rowNumber, cellNumber]) => {
-      setGrid((grid) =>
-        grid.map((row, rN) =>
-          row.map((cell, cN) =>
-            rN === rowNumber && cN === cellNumber ? currentPlayer : cell,
-          ),
-        ),
-      );
-      setCurrentPlayer((player) => (player === 'X' ? 'O' : 'X'));
-    },
-    [currentPlayer],
-  );
+  const claimCell = useCallback(([rowNumber, cellNumber]) => {
+    dispatch({ type: 'CLAIM_CELL', rowNumber, cellNumber });
+  }, []);
 
   return {
     claimCell,
