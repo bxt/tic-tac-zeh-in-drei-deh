@@ -1,5 +1,6 @@
 import { FC, useCallback, useState } from 'react';
 import { useLoader } from 'react-three-fiber';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import { Cell as CellType, Player } from './game';
 
@@ -22,7 +23,7 @@ type ObjectsGLTF = {
   };
 };
 
-export const Cell: FC<CellProps> = ({
+const Cell: FC<CellProps> = ({
   contents,
   currentPlayer,
   disabled,
@@ -30,13 +31,10 @@ export const Cell: FC<CellProps> = ({
   onClick,
   position,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const GLTFLoader = require('three/examples/jsm/loaders/GLTFLoader')
-    .GLTFLoader;
-  const { nodes } = useLoader<ObjectsGLTF>(
+  const { nodes } = (useLoader(
     GLTFLoader,
     `${basePath}/objects.glb`,
-  );
+  ) as unknown) as ObjectsGLTF;
 
   const handleClick = useCallback(
     (event) => {
@@ -96,3 +94,5 @@ export const Cell: FC<CellProps> = ({
     </>
   );
 };
+
+export default Cell;

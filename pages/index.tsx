@@ -4,10 +4,12 @@ import css from 'styled-jsx/css';
 import { Canvas } from 'react-three-fiber';
 
 import { useGameControls } from '../components/game';
-import { Cell } from '../components/cell';
 import { Controls } from '../components/controls';
 import { Suspense } from 'react';
 
+const Cell = dynamic(() => import('../components/cell'), {
+  ssr: false,
+});
 const Postprocessing = dynamic(() => import('../components/postprocessing'), {
   ssr: false,
 });
