@@ -1,4 +1,5 @@
 import { FC, useCallback, useState } from 'react';
+import { useLoader } from 'react-three-fiber';
 
 import { Cell as CellType, Player } from './game';
 
@@ -11,6 +12,16 @@ type CellProps = {
   position: [number, number, number];
 };
 
+const basePath = (process.env.__NEXT_ROUTER_BASEPATH as string) || '';
+
+type ObjectsGLTF = {
+  nodes: {
+    Pad: { geometry: unknown };
+    X: { geometry: unknown };
+    O: { geometry: unknown };
+  };
+};
+
 export const Cell: FC<CellProps> = ({
   contents,
   currentPlayer,
@@ -19,6 +30,14 @@ export const Cell: FC<CellProps> = ({
   onClick,
   position,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const GLTFLoader = require('three/examples/jsm/loaders/GLTFLoader')
+    .GLTFLoader;
+  const { nodes } = useLoader<ObjectsGLTF>(
+    GLTFLoader,
+    `${basePath}/objects.glb`,
+  );
+
   const handleClick = useCallback(
     (event) => {
       event.stopPropagation();
@@ -36,9 +55,7 @@ export const Cell: FC<CellProps> = ({
     setHover(false);
   }, []);
 
-  // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false);
-
   const hoveredYetNotDisabled = hovered && !disabled;
 
   const color = isInWinningArea
@@ -54,15 +71,28 @@ export const Cell: FC<CellProps> = ({
     : 'grey';
 
   return (
-    <mesh
-      position={position}
-      onClick={disabled ? undefined : handleClick}
-      scale={hoveredYetNotDisabled ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onPointerOver={disabled ? undefined : handlePointerOver}
-      onPointerOut={handlePointerOut}
-    >
-      <boxBufferGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+    <>
+      <mesh
+        onClick={disabled ? undefined : handleClick}
+        onPointerOut={handlePointerOut}
+        onPointerOver={disabled ? undefined : handlePointerOver}
+        position={position}
+      >
+        <primitive attach="geometry" object={nodes.Pad.geometry} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+      {contents === 'X' && (
+        <mesh position={position}>
+          <primitive attach="geometry" object={nodes.X.geometry} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+      )}
+      {contents === 'O' && (
+        <mesh position={position}>
+          <primitive attach="geometry" object={nodes.O.geometry} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+      )}
+    </>
   );
 };

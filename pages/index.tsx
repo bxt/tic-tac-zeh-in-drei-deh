@@ -5,6 +5,7 @@ import { Canvas } from 'react-three-fiber';
 import { useGameControls } from '../components/game';
 import { Cell } from '../components/cell';
 import { Controls } from '../components/controls';
+import { Suspense } from 'react';
 
 const basePath = (process.env.__NEXT_ROUTER_BASEPATH as string) || '';
 
@@ -29,21 +30,23 @@ export default function Home(): JSX.Element {
       <Canvas>
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
-        {grid.map((row, rowNumber) =>
-          row.map((cell, cellNumber) => (
-            <Cell
-              contents={cell}
-              currentPlayer={currentPlayer}
-              disabled={Boolean(cell || winner)}
-              isInWinningArea={isInWinningArea([rowNumber, cellNumber])}
-              key={rowNumber * row.length + cellNumber}
-              onClick={() => {
-                claimCell([rowNumber, cellNumber]);
-              }}
-              position={[1.2 * (rowNumber - 1), 0, 1.2 * (cellNumber - 1)]}
-            />
-          )),
-        )}
+        <Suspense fallback={null}>
+          {grid.map((row, rowNumber) =>
+            row.map((cell, cellNumber) => (
+              <Cell
+                contents={cell}
+                currentPlayer={currentPlayer}
+                disabled={Boolean(cell || winner)}
+                isInWinningArea={isInWinningArea([rowNumber, cellNumber])}
+                key={rowNumber * row.length + cellNumber}
+                onClick={() => {
+                  claimCell([rowNumber, cellNumber]);
+                }}
+                position={[1.2 * (rowNumber - 1), 0, 1.2 * (cellNumber - 1)]}
+              />
+            )),
+          )}
+        </Suspense>
         <Controls />
       </Canvas>
 
