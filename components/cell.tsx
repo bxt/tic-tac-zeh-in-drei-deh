@@ -30,8 +30,19 @@ export const Cell: FC<CellProps> = ({
     [onClick],
   );
 
+  const handlePointerOver = useCallback((event) => {
+    event.stopPropagation();
+    setHover(true);
+  }, []);
+
+  const handlePointerOut = useCallback(() => {
+    setHover(false);
+  }, []);
+
   // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false);
+
+  const hoveredYetNotDisabled = hovered && !disabled;
 
   const color = isInWinningArea
     ? 'hotpink'
@@ -39,7 +50,7 @@ export const Cell: FC<CellProps> = ({
     ? 'red'
     : contents === 'O'
     ? 'blue'
-    : hovered
+    : hoveredYetNotDisabled
     ? currentPlayer === 'X'
       ? '#f99'
       : '#99f'
@@ -50,14 +61,9 @@ export const Cell: FC<CellProps> = ({
       ref={mesh}
       position={position}
       onClick={disabled ? undefined : handleClick}
-      scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onPointerOver={(event) => {
-        event.stopPropagation();
-        setHover(true);
-      }}
-      onPointerOut={() => {
-        setHover(false);
-      }}
+      scale={hoveredYetNotDisabled ? [1.1, 1.1, 1.1] : [1, 1, 1]}
+      onPointerOver={disabled ? undefined : handlePointerOver}
+      onPointerOut={handlePointerOut}
     >
       <boxBufferGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color={color} />
