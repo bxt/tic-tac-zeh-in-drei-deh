@@ -100,6 +100,7 @@ export const globalStyles = css.global`
       Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     line-height: 1.6;
     height: 100%;
+    background: #334;
   }
   body > div {
     height: 100%;
