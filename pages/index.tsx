@@ -85,6 +85,7 @@ export default function Home(): JSX.Element {
           right: 1rem;
           color: #999;
           font-size: 0.7em;
+          filter: invert(1);
         }
       `}</style>
 
