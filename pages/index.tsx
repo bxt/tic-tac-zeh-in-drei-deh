@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import css from 'styled-jsx/css';
 import { Canvas } from 'react-three-fiber';
 
@@ -6,6 +7,10 @@ import { useGameControls } from '../components/game';
 import { Cell } from '../components/cell';
 import { Controls } from '../components/controls';
 import { Suspense } from 'react';
+
+const Postprocessing = dynamic(() => import('../components/postprocessing'), {
+  ssr: false,
+});
 
 const basePath = (process.env.__NEXT_ROUTER_BASEPATH as string) || '';
 
@@ -46,6 +51,7 @@ export default function Home(): JSX.Element {
               />
             )),
           )}
+          <Postprocessing />
         </Suspense>
         <Controls />
       </Canvas>
