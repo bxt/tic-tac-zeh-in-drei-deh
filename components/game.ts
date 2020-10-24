@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useReducer } from 'react';
 
 const players = ['X', 'O'] as const;
-type Player = typeof players[number];
-type Cell = Player | null;
+export type Player = typeof players[number];
+export type Cell = Player | null;
 type Grid = Cell[][];
 type CellCoords = [number, number];
 type Area = CellCoords[];
@@ -73,6 +73,7 @@ const reducer = ({ grid, currentPlayer }: State, action: Action): State => {
 
 type GameControls = {
   claimCell: (cellCoords: CellCoords) => void;
+  currentPlayer: Player;
   grid: Grid;
   isDraft: boolean;
   isInWinningArea: (cellCoords: CellCoords) => boolean;
@@ -82,7 +83,7 @@ type GameControls = {
 
 export const useGameControls = (): GameControls => {
   const [state, dispatch] = useReducer(reducer, makeInitialState());
-  const { grid } = state;
+  const { currentPlayer, grid } = state;
 
   const winningArea = useMemo(() => {
     return areas.find((area) => {
@@ -116,6 +117,7 @@ export const useGameControls = (): GameControls => {
 
   return {
     claimCell,
+    currentPlayer,
     grid,
     isDraft,
     isInWinningArea,

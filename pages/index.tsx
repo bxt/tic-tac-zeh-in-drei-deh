@@ -1,13 +1,66 @@
+import { FC, useRef, useState } from 'react';
 import Head from 'next/head';
 import css from 'styled-jsx/css';
+import { Canvas } from 'react-three-fiber';
 
-import { useGameControls } from '../components/game';
+import { useGameControls, Cell as CellType, Player } from '../components/game';
 
 const basePath = (process.env.__NEXT_ROUTER_BASEPATH as string) || '';
+
+type CellProps = {
+  contents: CellType;
+  currentPlayer: Player;
+  disabled: boolean;
+  isInWinningArea: boolean;
+  onClick: () => void;
+  position: [number, number, number];
+};
+
+const Cell: FC<CellProps> = ({
+  contents,
+  currentPlayer,
+  disabled,
+  isInWinningArea,
+  onClick,
+  position,
+}) => {
+  // This reference will give us direct access to the mesh
+  const mesh = useRef();
+
+  // Set up state for the hovered and active state
+  const [hovered, setHover] = useState(false);
+
+  const color = isInWinningArea
+    ? 'hotpink'
+    : contents === 'X'
+    ? 'red'
+    : contents === 'O'
+    ? 'blue'
+    : hovered
+    ? currentPlayer === 'X'
+      ? '#f99'
+      : '#99f'
+    : 'grey';
+
+  return (
+    <mesh
+      ref={mesh}
+      position={position}
+      onClick={disabled ? undefined : onClick}
+      scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    >
+      <boxBufferGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
+};
 
 export default function Home(): JSX.Element {
   const {
     claimCell,
+    currentPlayer,
     grid,
     isDraft,
     isInWinningArea,
@@ -16,85 +69,48 @@ export default function Home(): JSX.Element {
   } = useGameControls();
 
   return (
-    <div className="container">
+    <>
       <Head>
         <title>Tic-Tac-Zeh – in 3D!</title>
         <link rel="icon" href={`${basePath}/favicon.ico`} />
       </Head>
 
-      <main>
-        <h1>Tic-Tac-Zeh – in 3D!</h1>
-
-        {(winner || isDraft) && (
-          <div className="endscreen">
-            <div>
-              {winner && <div className="winner">{winner} wins!</div>}
-              {isDraft && <div className="draft">Draft!</div>}
-              <button onClick={restartGame}>Try again</button>
-            </div>
-          </div>
+      <Canvas>
+        <ambientLight />
+        <pointLight position={[10, 10, 10]} />
+        {grid.map((row, rowNumber) =>
+          row.map((cell, cellNumber) => (
+            <Cell
+              contents={cell}
+              currentPlayer={currentPlayer}
+              disabled={Boolean(cell || winner)}
+              isInWinningArea={isInWinningArea([rowNumber, cellNumber])}
+              key={rowNumber * row.length + cellNumber}
+              onClick={() => {
+                claimCell([rowNumber, cellNumber]);
+              }}
+              position={[1.2 * (rowNumber - 1), 1.2 * (cellNumber - 1), 0]}
+            />
+          )),
         )}
+      </Canvas>
 
-        <div className="grid">
-          {grid.map((row, rowNumber) => (
-            <div className="row" key={rowNumber}>
-              {row.map((cell, cellNumber) => (
-                <div className="cell" key={cellNumber}>
-                  <button
-                    className={
-                      isInWinningArea([rowNumber, cellNumber])
-                        ? 'hightlighted'
-                        : undefined
-                    }
-                    disabled={Boolean(cell || winner)}
-                    onClick={() => {
-                      claimCell([rowNumber, cellNumber]);
-                    }}
-                  >
-                    {cell || '-'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          ))}
+      {(winner || isDraft) && (
+        <div className="endscreen">
+          <div>
+            {winner && <div className="winner">{winner} wins!</div>}
+            {isDraft && <div className="draft">Draft!</div>}
+            <button onClick={restartGame}>Try again</button>
+          </div>
         </div>
-        <footer>
-          Created 2020 by Bernhard Häussner – Code on{' '}
-          <a href="https://github.com/bxt/tic-tac-zeh-in-drei-deh">GitHub</a>
-        </footer>
-      </main>
+      )}
+
+      <footer>
+        Created 2020 by Bernhard Häussner – Code on{' '}
+        <a href="https://github.com/bxt/tic-tac-zeh-in-drei-deh">GitHub</a>
+      </footer>
 
       <style jsx>{`
-        .container {
-          align-items: center;
-          display: flex;
-          justify-content: center;
-          max-width: 100%;
-          min-height: 100vh;
-        }
-        main {
-          background: papayawhip;
-          border-radius: 5px;
-          margin: 7rem 0.5rem;
-          padding: 1rem 2rem 2rem 2rem;
-          position: relative;
-        }
-        @media (min-width: 768px) {
-          main {
-            padding: 2rem 4rem 4rem 4rem;
-          }
-        }
-        h1 {
-          font-size: 20px;
-          margin-bottom: 0.5rem;
-          text-align: center;
-        }
-        @media (min-width: 768px) {
-          h1 {
-            font-size: 48px;
-            margin-bottom: 1rem;
-          }
-        }
         .endscreen {
           position: absolute;
           top: 0;
@@ -107,36 +123,23 @@ export default function Home(): JSX.Element {
           justify-content: center;
         }
         .endscreen > div {
-          padding: 1rem;
+          padding: 3rem;
           background: white;
           text-align: center;
         }
-        .row {
-          text-align: center;
-        }
-        .cell {
-          display: inline-block;
-        }
-        button {
-          width: 50px;
-          height: 50px;
-          margin: 0.5rem;
-        }
-        button.hightlighted {
-          background-color: hotpink;
-        }
         footer {
+          position: absolute;
+          bottom: 1rem;
+          right: 1rem;
           color: #999;
           font-size: 0.7em;
-          text-align: center;
-          margin-top: 2rem;
         }
       `}</style>
 
       <style jsx global>
         {globalStyles}
       </style>
-    </div>
+    </>
   );
 }
 
@@ -146,6 +149,10 @@ export const globalStyles = css.global`
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
       Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     line-height: 1.6;
+    height: 100%;
+  }
+  body > div {
+    height: 100%;
   }
   * {
     margin: 0;
