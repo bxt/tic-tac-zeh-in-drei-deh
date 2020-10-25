@@ -5,6 +5,10 @@ This is a small web app that allows you to play tic-tac-toe.
 
 [You can find the game running here](https://bxt.github.io/tic-tac-zeh-in-drei-deh/).
 
+This is how it looks like:
+
+![tic-tac-zeh-in-drei-deh](https://user-images.githubusercontent.com/639509/97096868-3109c380-166a-11eb-81b2-fa80879367d2.gif)
+
 Developing
 ----------
 
