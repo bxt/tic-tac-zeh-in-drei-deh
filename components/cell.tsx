@@ -3,6 +3,7 @@ import { useLoader } from 'react-three-fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import { Cell as CellType, Player } from './game';
+import { Particles } from './particles';
 
 type CellProps = {
   contents: CellType;
@@ -90,6 +91,12 @@ const Cell: FC<CellProps> = ({
           <primitive attach="geometry" object={nodes.O.geometry} />
           <meshStandardMaterial color="white" />
         </mesh>
+      )}
+      {isInWinningArea && (
+        <Particles
+          position={position}
+          color={contents === 'X' ? 'red' : contents === 'O' ? 'blue' : 'white'}
+        />
       )}
     </>
   );

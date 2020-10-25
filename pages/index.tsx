@@ -60,9 +60,7 @@ export default function Home(): JSX.Element {
 
       {(winner || isDraft) && (
         <div className="endscreen" onClick={restartGame}>
-          {winner && (
-            <div className={`winner winner${winner}`}>{winner} wins!</div>
-          )}
+          {winner && <div className="winner">{winner} wins!</div>}
           {isDraft && <div className="draft">Draft!</div>}
         </div>
       )}
@@ -90,11 +88,8 @@ export default function Home(): JSX.Element {
           text-transform: uppercase;
           text-shadow: 0 0 20px #223;
         }
-        .winnerX {
-          text-shadow: 0 0 20px red;
-        }
-        .winnerO {
-          text-shadow: 0 0 20px blue;
+        .winner {
+          text-shadow: 0 0 20px hotpink;
         }
         footer {
           position: absolute;
